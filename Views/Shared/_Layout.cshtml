@@ -1,0 +1,302 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using SesliKitapWeb.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sesli Kitap</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+    <style>
+        .navbar-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        .navbar-nav .nav-link {
+            color: #fff !important;
+            font-weight: 600;
+            margin-right: 8px;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s;
+            border-radius: 10px;
+            position: relative;
+        }
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s;
+        }
+        .navbar-nav .nav-link.active::before,
+        .navbar-nav .nav-link:hover::before {
+            width: 80%;
+        }
+        .navbar-nav .nav-link.active, .navbar-nav .nav-link:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .navbar-spacing {
+            width: 1px;
+            height: 30px;
+            background: rgba(255,255,255,0.3);
+            margin: 0 15px;
+        }
+        
+        .user-avatar-small {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+       
+        .navbar-user {
+            color: #fff;
+            font-weight: 600;
+            margin-right: 10px;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+        .navbar-user:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.15);
+            text-decoration: none !important;
+        }
+        .navbar-shadow {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .btn-outline-light {
+            border-width: 2px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        }
+        .btn-sm.btn-light, .btn-sm.btn-outline-light {
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .btn-sm.btn-light:hover, .btn-sm.btn-outline-light:hover {
+            transform: translateY(-2px);
+        }
+
+        .theme-switch {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+        }
+        .theme-switch:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        @@media (max-width: 991px) {
+            .navbar-nav .nav-link {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+            .navbar-custom {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+        }
+    </style>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-custom navbar-shadow sticky-top p-0" style="overflow: visible;">
+            <div class="navbar-animated-bg">
+                <div class="book-slider">
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=cover&w=80&q=80" alt="book1" />
+                    <img src="https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=cover&w=80&q=80" alt="book2" />
+                    <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=cover&w=80&q=80" alt="book3" />
+                    <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=cover&w=80&q=80" alt="book4" />
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=cover&w=80&q=80" alt="book1" />
+                    <img src="https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=cover&w=80&q=80" alt="book2" />
+                    <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=cover&w=80&q=80" alt="book3" />
+                    <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=cover&w=80&q=80" alt="book4" />
+                </div>
+            </div>
+            <div class="container position-relative">
+                <a class="navbar-brand marquee" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" alt="logo" width="32" class="me-2" style="filter: brightness(0) invert(1);" />
+                    <span class="marquee-text">Sesli Kitap - Hayal Gücünün Sesi</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Menüyü Aç">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Books" ? "active" : "")" asp-area="" asp-controller="Books" asp-action="Index">Kitaplar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Books" asp-action="Categories">Kategoriler</a>
+                        </li>
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" && ViewContext.RouteData.Values["action"]?.ToString() == "MyBooks" ? "active" : "")" asp-area="" asp-controller="Account" asp-action="MyBooks">Kitaplarım</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Recommendations" ? "active" : "")" asp-area="" asp-controller="Recommendations" asp-action="Index">Öneriler</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            var user = await UserManager.GetUserAsync(User);
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Search">
+                                    <i class="bi bi-search"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item d-flex align-items-center">
+                                <div class="navbar-spacing"></div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link d-flex align-items-center dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="user-avatar-small me-2">
+                                        @user.FirstName[0]@user.LastName[0]
+                                    </div>
+                                    <span>@user.FirstName</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Profile" asp-route-id=""><i class="bi bi-person me-2"></i>Profilim</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Follows" asp-action="PendingRequests"><i class="bi bi-inbox me-2"></i>Takip İstekleri</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline w-100">
+                                            <button type="submit" class="dropdown-item w-100">
+                                                <i class="bi bi-box-arrow-right me-2"></i>Çıkış Yap
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-sm btn-light me-2" asp-area="" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-sm btn-outline-light" asp-area="" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                            </li>
+                        }
+                        <li class="nav-item ms-2">
+                            <button id="themeToggle" class="theme-switch" title="Gece/Gündüz Modu" aria-label="Gece/Gündüz Modu">
+                                <span class="theme-switch-inner">
+                                    <svg class="theme-icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-13a.5.5 0 0 1 .5.5V2a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 8 0zm0 14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5zm8-6a.5.5 0 0 1-.5.5H14a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 .5.5zM2 8a.5.5 0 0 1-.5.5H0a.5.5 0 0 1 0-1h1.5A.5.5 0 0 1 2 8zm11.657-5.657a.5.5 0 0 1 0 .707l-1.06 1.06a.5.5 0 1 1-.707-.707l1.06-1.06a.5.5 0 0 1 .707 0zM3.343 12.657a.5.5 0 0 1 0 .707l-1.06 1.06a.5.5 0 1 1-.707-.707l1.06-1.06a.5.5 0 0 1 .707 0zm9.9 9.9a.5.5 0 0 1-.707 0l-1.06-1.06a.5.5 0 1 1 .707-.707l1.06 1.06a.5.5 0 0 1 0 .707zM3.343 3.343a.5.5 0 0 1-.707 0l-1.06-1.06a.5.5 0 1 1 .707-.707l1.06 1.06a.5.5 0 0 1 0 .707z"/>
+                                    </svg>
+                                    <svg class="theme-icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path d="M6 0a7 7 0 0 0 0 14c3.866 0 7-3.134 7-7 0-1.657-.672-3.156-1.757-4.243A.5.5 0 0 0 10.5 3.5c0 2.485-2.015 4.5-4.5 4.5a.5.5 0 0 0-.257.93A7.001 7.001 0 0 0 6 0z"/>
+                                    </svg>
+                                </span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container">
+            &copy; 2024 - Sesli Kitap - <a asp-area="" asp-controller="Home" asp-action="Privacy">Gizlilik</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Tema geçişi ve localStorage desteği
+        function setTheme(dark) {
+            if (dark) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var theme = localStorage.getItem('theme');
+            setTheme(theme === 'dark');
+            document.getElementById('themeToggle').addEventListener('click', function () {
+                var isDark = document.body.classList.contains('dark-mode');
+                setTheme(!isDark);
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
